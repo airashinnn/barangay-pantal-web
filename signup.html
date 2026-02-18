@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - BRIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .signup-container { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h1 { font-size: 28px; margin-bottom: 24px; color: #1a4d2e; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 16px; border: 2px solid #e7e5e4; border-radius: 10px; font-size: 14px; }
+        .btn-primary { width: 100%; padding: 12px; background: #1a4d2e; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-primary:hover { background: #2d6a4f; }
+        .login-link { text-align: center; margin-top: 16px; font-size: 14px; color: #57534e; }
+        .login-link a { color: #1a4d2e; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <h1>Create Account</h1>
+        <form id="signupForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Create password" required>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+            </div>
+            <div class="form-group">
+                <label for="userRole">User Role</label>
+                <select id="userRole" required>
+                    <option value="Resident">Resident</option>
+                    <option value="Barangay_Official">Barangay Official</option>
+                    <option value="Barangay_Secretary">Barangay Secretary</option>
+                    <option value="Barangay_Captain">Barangay Captain</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Sign Up</button>
+        </form>
+        <div class="login-link">
+            Already have an account? <a href="index.html">Login</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKjUzCvZBVfSFTnmJ8QXJcL7nNVlPiH3g",
+            authDomain: "bris-ae04d.firebaseapp.com",
+            projectId: "bris-ae04d",
+            storageBucket: "bris-ae04d.firebasestorage.app",
+            messagingSenderId: "626608470273",
+            appId: "1:626608470273:web:c33211ca2edb33465dc300"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        document.getElementById('signupForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const role = document.getElementById('userRole').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await setDoc(doc(db, "users", user.uid), {
+                    name: fullName,
+                    email: email,
+                    role: role,
+                    uid: user.uid,
+                    createdAt: new Date().toISOString()
+                });
+
+                alert('Account created successfully for ' + role + '!');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error("Error signing up:", error);
+                alert(error.message);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - BRIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a4d2e;
+            --accent: #f59e0b;
+            --bg-light: #fafaf9;
+            --bg-white: #ffffff;
+            --text-dark: #1c1917;
+            --text-gray: #57534e;
+            --border: #e7e5e4;
+            --shadow: rgba(26, 77, 46, 0.1);
+            --danger: #dc2626;
+            --success: #16a34a;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-light); color: var(--text-dark); }
+        .app-container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { width: 280px; background: linear-gradient(165deg, var(--primary) 0%, #0f2818 100%); padding: 30px 0; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 4px 0 12px var(--shadow); }
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; padding: 0 30px 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-icon { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 24px; color: #0f2818; font-weight:700; }
+        .logo-text h2 { font-family: 'DM Serif Display', serif; font-size:20px; color:#fff; margin-bottom:2px; }
+        .logo-text p { font-size:11px; color:rgba(255,255,255,0.6); letter-spacing:0.5px; }
+
+        .sidebar-nav { padding: 20px 0; }
+        .nav-section-title { font-size:12px; color: rgba(255,255,255,0.6); padding: 10px 30px; text-transform: uppercase; margin-top: 20px; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:12px 30px; color: rgba(255,255,255,0.8); text-decoration:none; transition: all 0.3s ease; font-size:15px; }
+        .nav-item.active { background: rgba(245,158,11,0.15); color: var(--accent); position: relative; }
+        .nav-item.active::before { content: ''; position:absolute; left:0; top:0; bottom:0; width:4px; background: var(--accent); }
+        .nav-icon svg { width:20px; height:20px; }
+
+        /* Main Content */
+        .main-content { flex:1; margin-left:280px; transition: margin-left 0.3s ease; }
+        .topbar { background: var(--bg-white); padding: 20px 40px; box-shadow: 0 2px 8px var(--shadow); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
+        .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size:28px; }
+        .content { padding: 40px; }
+
+        /* Settings Cards */
+        .settings-card { background: var(--bg-white); padding:30px; border-radius:16px; box-shadow:0 4px 12px var(--shadow); margin-bottom:30px; max-width:700px; }
+        .settings-card h2 { margin-bottom:20px; font-size:20px; color: var(--text-dark); }
+        .form-group { margin-bottom:16px; }
+        .form-group label { display:block; font-size:14px; margin-bottom:6px; color: var(--text-gray); }
+        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="password"] { width:100%; padding:10px 12px; border:2px solid var(--border); border-radius:12px; font-size:14px; }
+        .form-group input[type="checkbox"] { margin-right:8px; }
+
+        .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition: all 0.3s ease; }
+        .btn-save { background: var(--primary); color:#fff; }
+        .btn-save:hover { background: var(--accent); }
+
+        .btn-danger { background: var(--danger); color:#fff; }
+        .btn-danger:hover { background: #b91c1c; }
+
+        @media (max-width:1024px) { .main-content { margin-left:0; } .content { padding:24px; } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">B</div>
+                <div class="logo-text">
+                    <h2>BRIS</h2>
+                    <p>Admin Panel</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                        </div>
+                        Dashboard
+                    </a>
+                    <a href="Announcements.html" class="nav-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                            </svg>
+                        </div>
+                        Announcements
+                    </a>
+                    <a href="residents.html" class="nav-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                        </div>
+                        Residents
+                    </a>
+                    <a href="households.html" class="nav-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                        </div>
+                        Households
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Reports</div>
+                    <a href="reports.html" class="nav-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        Analytics
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                            </svg>
+                        </div>
+                        Export Data
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Settings</div>
+                    <a href="settings.html" class="nav-item active">
+                        <div class="nav-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <h1>Settings</h1>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Account Settings -->
+                <div class="settings-card">
+                    <h2>Account Settings</h2>
+                    <div class="form-group">
+                        <label for="profileName">Name</label>
+                        <input type="text" id="profileName" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="profileEmail">Email</label>
+                        <input type="email" id="profileEmail" placeholder="Enter your email">
+                    </div>
+                    <button class="btn btn-save">Save Changes</button>
+                </div>
+
+                <!-- Password Settings -->
+                <div class="settings-card">
+                    <h2>Password</h2>
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" placeholder="Enter current password">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" placeholder="Enter new password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                    </div>
+                    <button class="btn btn-save">Change Password</button>
+                    <button class="btn btn-danger" style="margin-top:10px;">Forgot Password</button>
+                </div>
+
+                <!-- Preferences -->
+                <div class="settings-card">
+                    <h2>Preferences</h2>
+                    <div class="form-group">
+                        <input type="checkbox" id="darkMode">
+                        <label for="darkMode">Enable Dark Mode</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="notifications">
+                        <label for="notifications">Enable Notifications</label>
+                    </div>
+                    <button class="btn btn-save">Save Preferences</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Example: Toggle Dark Mode
+        const darkModeToggle = document.getElementById('darkMode');
+        darkModeToggle.addEventListener('change', () => {
+            document.body.style.background = darkModeToggle.checked ? '#1c1c1c' : '#fafaf9';
+            document.body.style.color = darkModeToggle.checked ? '#f5f5f5' : '#1c1917';
+        });
+    </script>
+</body>
+</html>

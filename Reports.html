@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - BRIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a4d2e;
+            --primary-light: #2d6a4f;
+            --primary-dark: #0f2818;
+            --accent: #f59e0b;
+            --bg-light: #fafaf9;
+            --bg-white: #ffffff;
+            --text-dark: #1c1917;
+            --text-gray: #57534e;
+            --border: #e7e5e4;
+            --shadow: rgba(26, 77, 46, 0.1);
+            --danger: #dc2626;
+            --success: #16a34a;
+            --info: #2563eb;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: linear-gradient(165deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 30px 0; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 4px 0 12px var(--shadow); z-index: 100; }
+        .sidebar-brand { padding: 0 30px 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--primary-dark); font-weight: 700; }
+        .logo-text h2 { font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff; margin-bottom: 2px; }
+        .logo-text p { font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 0.5px; }
+        .sidebar-nav { padding: 20px 0; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-section-title { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 0 30px; margin-bottom: 8px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 30px; color: rgba(255,255,255,0.8); text-decoration: none; transition: all 0.3s ease; position: relative; font-size: 15px; cursor: pointer; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(245,158,11,0.15); color: var(--accent); }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+        .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Main Content */
+        .main-content { flex: 1; margin-left: 280px; transition: margin-left 0.3s ease; }
+        .topbar { background: var(--bg-white); padding: 20px 40px; box-shadow: 0 2px 8px var(--shadow); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 90; }
+        .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text-dark); }
+        .topbar-left p { color: var(--text-gray); font-size: 14px; margin-top: 4px; }
+        .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--bg-white); border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,77,46,0.3); }
+        .content { padding: 40px; }
+        
+        /* Reports Grid */
+        .reports-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .report-card { background: var(--bg-white); border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px var(--shadow); transition: all 0.3s ease; cursor: pointer; }
+        .report-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px var(--shadow); }
+        .report-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+        .report-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .report-icon i { font-size: 24px; }
+        .report-icon.primary { background: rgba(26,77,46,0.1); }
+        .report-icon.primary i { color: var(--primary); }
+        .report-icon.accent { background: rgba(245,158,11,0.1); }
+        .report-icon.accent i { color: var(--accent); }
+        .report-icon.info { background: rgba(37,99,235,0.1); }
+        .report-icon.info i { color: var(--info); }
+        .report-icon.success { background: rgba(22,163,74,0.1); }
+        .report-icon.success i { color: var(--success); }
+        .report-info h3 { font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+        .report-info p { font-size: 13px; color: var(--text-gray); }
+        .report-footer { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .report-count { font-size: 24px; font-weight: 700; color: var(--text-dark); }
+        .btn-export { padding: 8px 16px; background: var(--bg-light); color: var(--text-dark); border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; }
+        .btn-export:hover { background: var(--border); }
+        
+        /* Charts */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .section-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text-dark); }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .chart-card { background: var(--bg-white); border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px var(--shadow); }
+        .chart-header { margin-bottom: 20px; }
+        .chart-header h3 { font-size: 18px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+        .chart-header p { font-size: 13px; color: var(--text-gray); }
+        .chart-container { position: relative; height: 300px; }
+        
+        /* Table */
+        .table-card { background: var(--bg-white); border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px var(--shadow); margin-bottom: 40px; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: var(--bg-light); }
+        th { padding: 12px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; }
+        td { padding: 12px; border-top: 1px solid var(--border); font-size: 14px; }
+        .badge { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge.high { background: rgba(220,38,38,0.1); color: #dc2626; }
+        .badge.medium { background: rgba(245,158,11,0.1); color: var(--accent); }
+        .badge.low { background: rgba(22,163,74,0.1); color: #16a34a; }
+        
+        /* Filters */
+        .filters { background: var(--bg-white); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px var(--shadow); margin-bottom: 24px; }
+        .filter-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-group label { font-size: 12px; font-weight: 600; color: var(--text-gray); }
+        .filter-group select, .filter-group input { padding: 8px 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 14px; }
+        
+        /* Loading */
+        .loading { display: flex; justify-content: center; align-items: center; padding: 40px; }
+        .loading-spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .charts-grid, .reports-grid { grid-template-columns: 1fr; }
+            .content { padding: 20px; }
+            .topbar { padding: 16px 20px; flex-direction: column; gap: 16px; align-items: flex-start; }
+            .topbar-right { width: 100%; justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">
+                <div class="logo-icon">B</div>
+                <div class="logo-text">
+                    <h2>BRIS</h2>
+                    <p>ADMIN PANEL</p>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="dashboard.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-home"></i></div>
+                    Dashboard
+                </a>
+                <a href="Announcements.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-bullhorn"></i></div>
+                    Announcements
+                </a>
+                <a href="residents.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-users"></i></div>
+                    Residents
+                </a>
+                <a href="households.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-house-user"></i></div>
+                    Households
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Reports</div>
+                <a href="reports.html" class="nav-item active">
+                    <div class="nav-icon"><i class="fas fa-chart-bar"></i></div>
+                    Analytics
+                </a>
+                <a href="#" class="nav-item" onclick="exportAllData()">
+                    <div class="nav-icon"><i class="fas fa-file-export"></i></div>
+                    Export Data
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                <a href="settings.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-cog"></i></div>
+                    Settings
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Reports & Analytics</h1>
+                <p>View statistics and generate reports</p>
+            </div>
+            <div class="topbar-right">
+                <button class="btn-primary" onclick="exportAllData()">
+                    <i class="fas fa-download"></i> Export All Data
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="startDate">Date Range</label>
+                        <input type="date" id="startDate" title="Start date for report filtering" value="2024-01-01">
+                    </div>
+                    <div class="filter-group">
+                        <label for="endDate">to</label>
+                        <input type="date" id="endDate" title="End date for report filtering" value="2024-12-31">
+                    </div>
+                    <div class="filter-group">
+                        <label for="reportType">Report Type</label>
+                        <select id="reportType" title="Select report type to filter data">
+                            <option value="all">All Data</option>
+                            <option value="residents">Residents Only</option>
+                            <option value="households">Households Only</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                    <button class="btn-export" onclick="resetFilters()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Reports Grid -->
+            <div class="section-header"><h2 class="section-title">Quick Reports</h2></div>
+            <div class="reports-grid">
+                <div class="report-card" onclick="generateReport('all')">
+                    <div class="report-header">
+                        <div class="report-icon primary"><i class="fas fa-users"></i></div>
+                        <div class="report-info">
+                            <h3>All Residents</h3>
+                            <p>Complete list of residents</p>
+                        </div>
+                    </div>
+                    <div class="report-footer">
+                        <span class="report-count" id="allResidentsCount">0</span>
+                        <button class="btn-export" onclick="exportReport('all', event)">
+                            <i class="fas fa-download"></i> CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="report-card" onclick="generateReport('senior')">
+                    <div class="report-header">
+                        <div class="report-icon accent"><i class="fas fa-user-tie"></i></div>
+                        <div class="report-info">
+                            <h3>Senior Citizens</h3>
+                            <p>Residents aged 60 and above</p>
+                        </div>
+                    </div>
+                    <div class="report-footer">
+                        <span class="report-count" id="seniorCount">0</span>
+                        <button class="btn-export" onclick="exportReport('senior', event)">
+                            <i class="fas fa-download"></i> CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="report-card" onclick="generateReport('voters')">
+                    <div class="report-header">
+                        <div class="report-icon success"><i class="fas fa-vote-yea"></i></div>
+                        <div class="report-info">
+                            <h3>Registered Voters</h3>
+                            <p>List of registered voters</p>
+                        </div>
+                    </div>
+                    <div class="report-footer">
+                        <span class="report-count" id="votersCount">0</span>
+                        <button class="btn-export" onclick="exportReport('voters', event)">
+                            <i class="fas fa-download"></i> CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="report-card" onclick="generateReport('pwd')">
+                    <div class="report-header">
+                        <div class="report-icon info"><i class="fas fa-wheelchair"></i></div>
+                        <div class="report-info">
+                            <h3>PWD</h3>
+                            <p>Persons with disabilities</p>
+                        </div>
+                    </div>
+                    <div class="report-footer">
+                        <span class="report-count" id="pwdCount">0</span>
+                        <button class="btn-export" onclick="exportReport('pwd', event)">
+                            <i class="fas fa-download"></i> CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Age Distribution Table -->
+            <div class="section-header">
+                <h2 class="section-title">Age Distribution</h2>
+                <button class="btn-export" onclick="exportAgeTable()">
+                    <i class="fas fa-download"></i> Export Table
+                </button>
+            </div>
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Age Group</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ageTableBody">
+                        <tr><td colspan="4" class="loading">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="section-header"><h2 class="section-title">Charts</h2></div>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Age Groups</h3>
+                        <p>Distribution of residents by age</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Gender Distribution</h3>
+                        <p>Male vs Female residents</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Resident Categories</h3>
+                        <p>Special categories breakdown</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categoriesChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Household Size</h3>
+                        <p>Number of members per household</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="householdChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase and Script -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            query, 
+            where,
+            orderBy
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKjUzCvZBVfSFTnmJ8QXJcL7nNVlPiH3g",
+            authDomain: "bris-ae04d.firebaseapp.com",
+            projectId: "bris-ae04d",
+            storageBucket: "bris-ae04d.firebasestorage.app",
+            messagingSenderId: "626608470273",
+            appId: "1:626608470273:web:c33211ca2edb33465dc300",
+            measurementId: "G-WFNQCMHVBW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let residents = [];
+        let households = [];
+        let charts = {};
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Role check
+            const role = localStorage.getItem('userRole');
+            if (role === 'Resident') {
+                alert('Access Denied! This page is for Officials and Captain only.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            await loadReportsData();
+        });
+
+        // Load Reports Data
+        async function loadReportsData() {
+            try {
+                showLoading();
+                
+                // Load residents
+                const residentsQuery = query(collection(db, 'residents'), orderBy('lastName'));
+                const residentsSnapshot = await getDocs(residentsQuery);
+                residents = [];
+                residentsSnapshot.forEach(doc => {
+                    residents.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Load households
+                const householdsQuery = query(collection(db, 'households'), orderBy('householdNumber'));
+                const householdsSnapshot = await getDocs(householdsQuery);
+                households = [];
+                householdsSnapshot.forEach(doc => {
+                    households.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                updateReportCounts();
+                updateAgeTable();
+                createCharts();
+                
+            } catch (error) {
+                console.error('Error loading reports data:', error);
+                alert('Failed to load reports data: ' + error.message);
+            }
+        }
+
+        // Update Report Counts
+        function updateReportCounts() {
+            document.getElementById('allResidentsCount').textContent = residents.length;
+            document.getElementById('seniorCount').textContent = residents.filter(r => r.age >= 60).length;
+            document.getElementById('votersCount').textContent = residents.filter(r => r.isVoter).length;
+            document.getElementById('pwdCount').textContent = residents.filter(r => r.isPWD).length;
+        }
+
+        // Update Age Table
+        function updateAgeTable() {
+            const ageGroups = [
+                { name: '0-17 (Children)', min: 0, max: 17 },
+                { name: '18-35 (Young Adults)', min: 18, max: 35 },
+                { name: '36-59 (Adults)', min: 36, max: 59 },
+                { name: '60+ (Senior Citizens)', min: 60, max: 150 }
+            ];
+
+            const tbody = document.getElementById('ageTableBody');
+            const total = residents.length;
+
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No data available</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ageGroups.map(group => {
+                const count = residents.filter(r => r.age >= group.min && r.age <= group.max).length;
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+                
+                let status = 'low';
+                if (percentage > 30) status = 'high';
+                else if (percentage > 20) status = 'medium';
+                
+                return `
+                    <tr>
+                        <td>${group.name}</td>
+                        <td><strong>${count}</strong></td>
+                        <td>${percentage}%</td>
+                        <td><span class="badge ${status}">${status.toUpperCase()}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Create Charts
+        function createCharts() {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            
+            // Age Chart
+            const ageGroups = { '0-17': 0, '18-35': 0, '36-59': 0, '60+': 0 };
+            residents.forEach(r => {
+                if (r.age < 18) ageGroups['0-17']++;
+                else if (r.age < 36) ageGroups['18-35']++;
+                else if (r.age < 60) ageGroups['36-59']++;
+                else ageGroups['60+']++;
+            });
+
+            charts.age = new Chart(document.getElementById('ageChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(ageGroups),
+                    datasets: [{
+                        label: 'Number of Residents',
+                        data: Object.values(ageGroups),
+                        backgroundColor: [
+                            'rgba(26, 77, 46, 0.8)',
+                            'rgba(45, 106, 79, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(220, 38, 38, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(26, 77, 46)',
+                            'rgb(45, 106, 79)',
+                            'rgb(245, 158, 11)',
+                            'rgb(220, 38, 38)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 5 }
+                        }
+                    }
+                }
+            });
+
+            // Gender Chart
+            const genderCounts = {
+                Male: residents.filter(r => r.gender === 'Male' || r.gender === 'M').length,
+                Female: residents.filter(r => r.gender === 'Female' || r.gender === 'F').length
+            };
+
+            charts.gender = new Chart(document.getElementById('genderChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Male', 'Female'],
+                    datasets: [{
+                        data: [genderCounts.Male, genderCounts.Female],
+                        backgroundColor: [
+                            'rgba(26, 77, 46, 0.8)',
+                            'rgba(245, 158, 11, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(26, 77, 46)',
+                            'rgb(245, 158, 11)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Categories Chart
+            const categories = {
+                'Senior Citizens': residents.filter(r => r.age >= 60).length,
+                'PWD': residents.filter(r => r.isPWD).length,
+                '4Ps': residents.filter(r => r.is4Ps).length,
+                'Voters': residents.filter(r => r.isVoter).length
+            };
+
+            charts.categories = new Chart(document.getElementById('categoriesChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        label: 'Count',
+                        data: Object.values(categories),
+                        backgroundColor: [
+                            'rgba(26, 77, 46, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(37, 99, 235, 0.8)',
+                            'rgba(22, 163, 74, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(26, 77, 46)',
+                            'rgb(245, 158, 11)',
+                            'rgb(37, 99, 235)',
+                            'rgb(22, 163, 74)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Household Chart
+            const householdSizes = { '1-2': 0, '3-4': 0, '5-6': 0, '7+': 0 };
+            households.forEach(h => {
+                const members = h.totalMembers || 1;
+                if (members <= 2) householdSizes['1-2']++;
+                else if (members <= 4) householdSizes['3-4']++;
+                else if (members <= 6) householdSizes['5-6']++;
+                else householdSizes['7+']++;
+            });
+
+            charts.household = new Chart(document.getElementById('householdChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: Object.keys(householdSizes),
+                    datasets: [{
+                        label: 'Number of Households',
+                        data: Object.values(householdSizes),
+                        borderColor: 'rgb(26, 77, 46)',
+                        backgroundColor: 'rgba(26, 77, 46, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Generate Report
+        function generateReport(type) {
+            let data = [];
+            let title = '';
+            
+            switch(type) {
+                case 'all':
+                    data = residents;
+                    title = 'All_Residents';
+                    break;
+                case 'senior':
+                    data = residents.filter(r => r.age >= 60);
+                    title = 'Senior_Citizens';
+                    break;
+                case 'voters':
+                    data = residents.filter(r => r.isVoter);
+                    title = 'Registered_Voters';
+                    break;
+                case 'pwd':
+                    data = residents.filter(r => r.isPWD);
+                    title = 'PWD_Residents';
+                    break;
+            }
+            
+            if (data.length === 0) {
+                alert('No data available for this report');
+                return;
+            }
+            
+            exportToCSV(data, `${title}_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+
+        // Export Report (with event stop)
+        function exportReport(type, event) {
+            if (event) event.stopPropagation();
+            generateReport(type);
+        }
+
+        // Export All Data
+        window.exportAllData = function() {
+            const allData = {
+                residents: residents,
+                households: households
+            };
+            
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = window.URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `BRIS_Complete_Data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+
+        // Export Age Table
+        function exportAgeTable() {
+            const rows = [];
+            const headers = ['Age Group', 'Count', 'Percentage', 'Status'];
+            rows.push(headers.join(','));
+            
+            const ageGroups = [
+                { name: '0-17 (Children)', min: 0, max: 17 },
+                { name: '18-35 (Young Adults)', min: 18, max: 35 },
+                { name: '36-59 (Adults)', min: 36, max: 59 },
+                { name: '60+ (Senior Citizens)', min: 60, max: 150 }
+            ];
+            
+            const total = residents.length;
+            
+            ageGroups.forEach(group => {
+                const count = residents.filter(r => r.age >= group.min && r.age <= group.max).length;
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+                rows.push([group.name, count, percentage + '%', 'Normal'].join(','));
+            });
+            
+            const csvContent = rows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Age_Distribution_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Export to CSV
+        function exportToCSV(data, filename) {
+            if (!data.length) {
+                alert('No data to export');
+                return;
+            }
+            
+            const headers = ['ID', 'First Name', 'Last Name', 'Middle Name', 'Age', 'Gender', 'Birthdate', 
+                           'Address', 'Contact Number', 'Email', 'Civil Status', 'Occupation', 
+                           'Is Voter', 'Is PWD', 'Is 4Ps', 'Household Number', 'Status'];
+            
+            const csvContent = [
+                headers.join(','),
+                ...data.map(r => [
+                    r.id || '',
+                    `"${(r.firstName || '').replace(/"/g, '""')}"`,
+                    `"${(r.lastName || '').replace(/"/g, '""')}"`,
+                    `"${(r.middleName || '').replace(/"/g, '""')}"`,
+                    r.age || '',
+                    r.gender || '',
+                    r.birthdate || '',
+                    `"${(r.address || '').replace(/"/g, '""')}"`,
+                    r.contactNumber || '',
+                    r.email || '',
+                    r.civilStatus || '',
+                    r.occupation || '',
+                    r.isVoter ? 'Yes' : 'No',
+                    r.isPWD ? 'Yes' : 'No',
+                    r.is4Ps ? 'Yes' : 'No',
+                    r.householdNumber || '',
+                    r.status || 'Active'
+                ].join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Apply Filters
+        function applyFilters() {
+            // In a real app, you would filter data based on selected criteria
+            alert('Filter functionality would be implemented here');
+        }
+
+        // Reset Filters
+        function resetFilters() {
+            document.getElementById('startDate').value = '2024-01-01';
+            document.getElementById('endDate').value = '2024-12-31';
+            document.getElementById('reportType').value = 'all';
+        }
+
+        // Show Loading
+        function showLoading() {
+            document.getElementById('ageTableBody').innerHTML = '<tr><td colspan="4" class="loading">Loading data...</td></tr>';
+        }
+
+        // Initialize filters with current date
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), 0, 1);
+            document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>

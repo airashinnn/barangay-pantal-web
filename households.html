@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Households - BRIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a4d2e;
+            --primary-light: #2d6a4f;
+            --primary-dark: #0f2818;
+            --accent: #f59e0b;
+            --bg-light: #fafaf9;
+            --bg-white: #ffffff;
+            --text-dark: #1c1917;
+            --text-gray: #57534e;
+            --border: #e7e5e4;
+            --shadow: rgba(26, 77, 46, 0.1);
+            --danger: #dc2626;
+            --success: #16a34a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: linear-gradient(165deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 30px 0; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 4px 0 12px var(--shadow); z-index: 100; }
+        .sidebar-brand { padding: 0 30px 30px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--primary-dark); font-weight: 700; }
+        .logo-text h2 { font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff; margin-bottom: 2px; }
+        .logo-text p { font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 0.5px; }
+        .sidebar-nav { padding: 20px 0; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-section-title { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 0 30px; margin-bottom: 8px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 30px; color: rgba(255,255,255,0.8); text-decoration: none; transition: all 0.3s ease; position: relative; font-size: 15px; cursor: pointer; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(245,158,11,0.15); color: var(--accent); }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+        .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Main Content */
+        .main-content { flex: 1; margin-left: 280px; transition: margin-left 0.3s ease; }
+        .topbar { background: var(--bg-white); padding: 20px 40px; box-shadow: 0 2px 8px var(--shadow); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 90; }
+        .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text-dark); }
+        .topbar-left p { color: var(--text-gray); font-size: 14px; margin-top: 4px; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--bg-white); border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,77,46,0.3); }
+        .content { padding: 40px; }
+        
+        /* Household Grid */
+        .household-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px; }
+        .household-card { background: var(--bg-white); border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px var(--shadow); transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
+        .household-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%); }
+        .household-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px var(--shadow); }
+        .household-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .household-icon { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); display: flex; align-items: center; justify-content: center; }
+        .household-icon i { font-size: 24px; color: white; }
+        .household-actions { display: flex; gap: 8px; }
+        .btn-icon { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; background: var(--bg-light); }
+        .btn-icon:hover { transform: scale(1.1); }
+        .btn-icon.edit { color: var(--accent); }
+        .btn-icon.edit:hover { background: var(--accent); color: white; }
+        .btn-icon.delete { color: var(--danger); }
+        .btn-icon.delete:hover { background: var(--danger); color: white; }
+        .household-info h3 { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+        .household-info p { font-size: 14px; color: var(--text-gray); margin-bottom: 16px; }
+        .household-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+        .detail-item { display: flex; flex-direction: column; gap: 4px; }
+        .detail-label { font-size: 11px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .detail-value { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .members-list { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
+        .members-header { font-size: 12px; color: var(--text-gray); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .member-count { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: rgba(26,77,46,0.1); color: var(--primary); border-radius: 6px; font-size: 13px; font-weight: 600; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content { background: var(--bg-white); border-radius: 20px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text-dark); }
+        .btn-close { width: 32px; height: 32px; border: none; background: var(--bg-light); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .btn-close:hover { background: var(--border); }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; transition: all 0.3s ease; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,77,46,0.1); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .modal-footer { padding: 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end; }
+        .btn-secondary { padding: 12px 24px; background: var(--bg-light); color: var(--text-dark); border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-secondary:hover { background: var(--border); }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; background: var(--bg-white); border-radius: 16px; grid-column: 1/-1; }
+        .empty-state i { font-size: 80px; color: var(--text-gray); margin-bottom: 20px; }
+        .empty-state h3 { font-size: 20px; color: var(--text-dark); margin-bottom: 8px; }
+        .empty-state p { color: var(--text-gray); font-size: 14px; }
+        
+        /* Loading */
+        .loading { display: flex; justify-content: center; align-items: center; padding: 40px; }
+        .loading-spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .household-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .content { padding: 20px; }
+            .topbar { padding: 16px 20px; flex-direction: column; gap: 16px; align-items: flex-start; }
+            .topbar-right { width: 100%; justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">
+                <div class="logo-icon">B</div>
+                <div class="logo-text">
+                    <h2>BRIS</h2>
+                    <p>ADMIN PANEL</p>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="dashboard.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-home"></i></div>
+                    Dashboard
+                </a>
+                <a href="Announcements.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-bullhorn"></i></div>
+                    Announcements
+                </a>
+                <a href="residents.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-users"></i></div>
+                    Residents
+                </a>
+                <a href="households.html" class="nav-item active">
+                    <div class="nav-icon"><i class="fas fa-house-user"></i></div>
+                    Households
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Reports</div>
+                <a href="reports.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-chart-bar"></i></div>
+                    Analytics
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-file-export"></i></div>
+                    Export Data
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                <a href="settings.html" class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-cog"></i></div>
+                    Settings
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Households</h1>
+                <p>Manage all households in the barangay</p>
+            </div>
+            <div class="topbar-right">
+                <button class="btn-primary" onclick="openModal()">
+                    <i class="fas fa-plus"></i> Add Household
+                </button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="household-grid" id="householdGrid">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="householdModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Household</h2>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="householdForm">
+                <div class="modal-body">
+                    <input type="hidden" id="householdId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Household Number *</label>
+                            <input type="text" id="householdNumber" placeholder="HH-001" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Zone/Street *</label>
+                            <input type="text" id="zone" placeholder="Zone 1, Street 2" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Head of Family *</label>
+                        <input type="text" id="headOfFamily" placeholder="Juan Dela Cruz" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Address *</label>
+                        <textarea id="address" placeholder="Complete address" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Number *</label>
+                            <input type="tel" id="contactNumber" placeholder="09123456789" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Members *</label>
+                            <input type="number" id="totalMembers" placeholder="5" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>House Type</label>
+                            <select id="houseType">
+                                <option value="Single">Single</option>
+                                <option value="Duplex">Duplex</option>
+                                <option value="Apartment">Apartment</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="notes" placeholder="Additional notes"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Household</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase and Script -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            updateDoc, 
+            deleteDoc, 
+            doc, 
+            getDocs, 
+            query, 
+            orderBy,
+            Timestamp 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKjUzCvZBVfSFTnmJ8QXJcL7nNVlPiH3g",
+            authDomain: "bris-ae04d.firebaseapp.com",
+            projectId: "bris-ae04d",
+            storageBucket: "bris-ae04d.firebasestorage.app",
+            messagingSenderId: "626608470273",
+            appId: "1:626608470273:web:c33211ca2edb33465dc300",
+            measurementId: "G-WFNQCMHVBW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentHouseholdId = null;
+        let households = [];
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Role check
+            const role = localStorage.getItem('userRole');
+            if (role === 'Resident') {
+                alert('Access Denied! This page is for Officials and Captain only.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            loadHouseholds();
+        });
+
+        // Load Households from Firebase
+        async function loadHouseholds() {
+            try {
+                const grid = document.getElementById('householdGrid');
+                grid.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+                
+                const q = query(collection(db, 'households'), orderBy('householdNumber'));
+                const querySnapshot = await getDocs(q);
+                
+                households = [];
+                querySnapshot.forEach((docSnap) => {
+                    households.push({
+                        id: docSnap.id,
+                        ...docSnap.data()
+                    });
+                });
+                
+                displayHouseholds(households);
+            } catch (error) {
+                console.error('Error loading households:', error);
+                showError('Failed to load households');
+            }
+        }
+
+        // Display Households
+        function displayHouseholds(data) {
+            const grid = document.getElementById('householdGrid');
+            
+            if (data.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-house-user"></i>
+                        <h3>No households found</h3>
+                        <p>Start by adding your first household to the system</p>
+                        <button class="btn-primary" style="margin-top: 20px;" onclick="openModal()">
+                            <i class="fas fa-plus"></i> Add Household
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = data.map(household => `
+                <div class="household-card" onclick="viewHousehold('${household.id}')">
+                    <div class="household-header">
+                        <div class="household-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="household-actions">
+                            <button class="btn-icon edit" onclick="editHousehold('${household.id}', event)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon delete" onclick="deleteHousehold('${household.id}', event)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="household-info">
+                        <h3>${household.householdNumber}</h3>
+                        <p>${household.headOfFamily}</p>
+                    </div>
+                    <div class="household-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Address</span>
+                            <span class="detail-value">${household.zone || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Contact</span>
+                            <span class="detail-value">${household.contactNumber || 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="members-list">
+                        <div class="members-header">
+                            <span class="member-count">
+                                <i class="fas fa-users"></i>
+                                ${household.totalMembers || 0} Member${household.totalMembers !== 1 ? 's' : ''}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open Modal
+        function openModal(householdId = null) {
+            const modal = document.getElementById('householdModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('householdForm');
+            
+            currentHouseholdId = householdId;
+            
+            if (householdId) {
+                title.textContent = 'Edit Household';
+                const household = households.find(h => h.id === householdId);
+                if (household) {
+                    document.getElementById('householdId').value = household.id;
+                    document.getElementById('householdNumber').value = household.householdNumber;
+                    document.getElementById('zone').value = household.zone || '';
+                    document.getElementById('headOfFamily').value = household.headOfFamily;
+                    document.getElementById('address').value = household.address || '';
+                    document.getElementById('contactNumber').value = household.contactNumber || '';
+                    document.getElementById('totalMembers').value = household.totalMembers || 1;
+                    document.getElementById('houseType').value = household.houseType || 'Single';
+                    document.getElementById('status').value = household.status || 'Active';
+                    document.getElementById('notes').value = household.notes || '';
+                }
+            } else {
+                title.textContent = 'Add Household';
+                form.reset();
+            }
+            
+            modal.classList.add('active');
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('householdModal').classList.remove('active');
+            document.getElementById('householdForm').reset();
+            currentHouseholdId = null;
+        }
+
+        // View Household Details
+        function viewHousehold(id) {
+            const household = households.find(h => h.id === id);
+            if (household) {
+                alert(`
+                    Household Details:
+                    Number: ${household.householdNumber}
+                    Head: ${household.headOfFamily}
+                    Address: ${household.address}
+                    Zone: ${household.zone}
+                    Contact: ${household.contactNumber}
+                    Members: ${household.totalMembers}
+                    Type: ${household.houseType}
+                    Status: ${household.status}
+                    Notes: ${household.notes || 'None'}
+                `);
+            }
+        }
+
+        // Edit Household
+        function editHousehold(id, event) {
+            event.stopPropagation();
+            openModal(id);
+        }
+
+        // Delete Household
+        async function deleteHousehold(id, event) {
+            event.stopPropagation();
+            
+            if (!confirm('Are you sure you want to delete this household?')) {
+                return;
+            }
+            
+            try {
+                await deleteDoc(doc(db, 'households', id));
+                showSuccess('Household deleted successfully');
+                loadHouseholds();
+            } catch (error) {
+                console.error('Error deleting household:', error);
+                showError('Failed to delete household');
+            }
+        }
+
+        // Save Household
+        document.getElementById('householdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const householdData = {
+                householdNumber: document.getElementById('householdNumber').value.trim(),
+                zone: document.getElementById('zone').value.trim(),
+                headOfFamily: document.getElementById('headOfFamily').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                contactNumber: document.getElementById('contactNumber').value.trim(),
+                totalMembers: parseInt(document.getElementById('totalMembers').value),
+                houseType: document.getElementById('houseType').value,
+                status: document.getElementById('status').value,
+                notes: document.getElementById('notes').value.trim(),
+                updatedAt: Timestamp.now()
+            };
+            
+            if (!householdData.householdNumber || !householdData.headOfFamily) {
+                showError('Household number and head of family are required');
+                return;
+            }
+            
+            try {
+                if (currentHouseholdId) {
+                    // Update existing
+                    await updateDoc(doc(db, 'households', currentHouseholdId), householdData);
+                    showSuccess('Household updated successfully');
+                } else {
+                    // Add new
+                    householdData.createdAt = Timestamp.now();
+                    await addDoc(collection(db, 'households'), householdData);
+                    showSuccess('Household added successfully');
+                }
+                
+                closeModal();
+                loadHouseholds();
+            } catch (error) {
+                console.error('Error saving household:', error);
+                showError('Failed to save household: ' + error.message);
+            }
+        });
+
+        // Utility Functions
+        function showSuccess(message) {
+            alert(message);
+        }
+
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        // Search Functionality
+        function searchHouseholds(searchTerm) {
+            const filtered = households.filter(household => 
+                household.householdNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                household.headOfFamily.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                household.zone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                household.address.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            displayHouseholds(filtered);
+        }
+
+        // Add search input dynamically
+        document.addEventListener('DOMContentLoaded', () => {
+            const topbarRight = document.querySelector('.topbar-right');
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Search households...';
+            searchInput.style.padding = '10px 16px';
+            searchInput.style.borderRadius = '8px';
+            searchInput.style.border = '2px solid var(--border)';
+            searchInput.style.marginRight = '10px';
+            searchInput.style.width = '200px';
+            searchInput.addEventListener('input', (e) => {
+                searchHouseholds(e.target.value);
+            });
+            topbarRight.insertBefore(searchInput, topbarRight.firstChild);
+        });
+    </script>
+</body>
+</html>

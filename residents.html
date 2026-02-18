@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Residents - BRIS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1a4d2e;
+      --primary-light: #2d6a4f;
+      --primary-dark: #0f2818;
+      --accent: #f59e0b;
+      --bg-light: #fafaf9;
+      --bg-white: #ffffff;
+      --text-dark: #1c1917;
+      --text-gray: #57534e;
+      --border: #e7e5e4;
+      --shadow: rgba(26, 77, 46, 0.1);
+      --danger: #dc2626;
+      --success: #16a34a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 280px; background: linear-gradient(165deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 30px 0; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 4px 0 12px var(--shadow); }
+    .sidebar-brand { padding: 0 30px 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .sidebar-logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--primary-dark); font-weight: 700; }
+    .logo-text h2 { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--bg-white); margin-bottom: 2px; }
+    .logo-text p { font-size: 11px; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.5px; }
+    .sidebar-nav { padding: 20px 0; }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title { font-size: 11px; color: rgba(255, 255, 255, 0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 0 30px; margin-bottom: 8px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 30px; color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: all 0.3s ease; position: relative; font-size: 15px; }
+    .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: var(--bg-white); }
+    .nav-item.active { background: rgba(245, 158, 11, 0.15); color: var(--accent); }
+    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+    .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+
+    /* Main Content */
+    .main-content { flex: 1; margin-left: 280px; }
+    .topbar { background: var(--bg-white); padding: 20px 40px; box-shadow: 0 2px 8px var(--shadow); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .topbar-left h1 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text-dark); }
+    .topbar-left p { color: var(--text-gray); font-size: 14px; margin-top: 4px; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .btn-primary { padding: 12px 24px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--bg-white); border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26, 77, 46, 0.3); }
+    .content { padding: 40px; }
+
+    /* Search and Filters */
+    .controls-bar { background: var(--bg-white); padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px var(--shadow); margin-bottom: 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+    .search-box { flex: 1; min-width: 250px; position: relative; }
+    .search-box input { width: 100%; padding: 12px 16px 12px 44px; border: 2px solid var(--border); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; transition: all 0.3s ease; }
+    .search-box input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26, 77, 46, 0.1); }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; }
+    .search-icon i { color: var(--text-gray); font-size: 16px; }
+    .filter-select { padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.3s ease; min-width: 150px; }
+    .filter-select:focus { outline: none; border-color: var(--primary); }
+
+    /* Residents Table */
+    .residents-table { background: var(--bg-white); border-radius: 16px; box-shadow: 0 4px 12px var(--shadow); overflow: hidden; }
+    .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .table-header h2 { font-size: 18px; font-weight: 600; color: var(--text-dark); }
+    .table-info { font-size: 14px; color: var(--text-gray); }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--bg-light); }
+    th { padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 16px 24px; border-top: 1px solid var(--border); font-size: 14px; }
+    tbody tr { transition: background 0.2s ease; }
+    tbody tr:hover { background: var(--bg-light); }
+    .resident-name { display: flex; align-items: center; gap: 12px; }
+    .resident-avatar { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--bg-white); font-weight: 600; font-size: 16px; }
+    .resident-info { flex: 1; }
+    .resident-info h4 { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+    .resident-info p { font-size: 12px; color: var(--text-gray); }
+    .badge { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-block; }
+    .badge.active { background: rgba(22, 163, 74, 0.1); color: var(--success); }
+    .badge.inactive { background: rgba(220, 38, 38, 0.1); color: var(--danger); }
+    .badge.voter { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+    .action-buttons { display: flex; gap: 8px; }
+    .btn-icon { width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+    .btn-icon.edit { background: rgba(245, 158, 11, 0.1); color: var(--accent); }
+    .btn-icon.edit:hover { background: var(--accent); color: var(--bg-white); }
+    .btn-icon.delete { background: rgba(220, 38, 38, 0.1); color: var(--danger); }
+    .btn-icon.delete:hover { background: var(--danger); color: var(--bg-white); }
+    .btn-icon i { font-size: 14px; }
+
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+    .modal.active { display: flex; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-content { background: var(--bg-white); border-radius: 20px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text-dark); }
+    .btn-close { width: 32px; height: 32px; border: none; background: var(--bg-light); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+    .btn-close:hover { background: var(--border); }
+    .modal-body { padding: 24px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .form-grid.full { grid-template-columns: 1fr; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+    .form-group input, .form-group select, .form-group textarea { padding: 12px 16px; border: 2px solid var(--border); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; transition: all 0.3s ease; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26, 77, 46, 0.1); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+    .checkbox-group label { margin: 0; cursor: pointer; }
+    .modal-footer { padding: 24px; border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end; }
+    .btn-secondary { padding: 12px 24px; background: var(--bg-light); color: var(--text-dark); border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+    .btn-secondary:hover { background: var(--border); }
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state i { font-size: 48px; color: var(--text-gray); margin-bottom: 20px; }
+    .empty-state h3 { font-size: 20px; color: var(--text-dark); margin-bottom: 8px; }
+    .empty-state p { color: var(--text-gray); font-size: 14px; }
+
+    /* Restricted Access Message */
+    .restricted-access { text-align: center; padding: 60px 20px; }
+    .restricted-access h3 { color: var(--danger); margin-bottom: 16px; }
+    .restricted-access p { color: var(--text-gray); margin-bottom: 24px; }
+
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .controls-bar { flex-direction: column; }
+      table { font-size: 12px; }
+      th, td { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">
+      <div class="logo-icon">B</div>
+      <div class="logo-text">
+        <h2>BRIS</h2>
+        <p>ADMIN PANEL</p>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <a href="dashboard.html" class="nav-item">
+        <div class="nav-icon"><i class="fas fa-home"></i></div>
+        Dashboard
+      </a>
+      <a href="Announcements.html" class="nav-item">
+        <div class="nav-icon"><i class="fas fa-bullhorn"></i></div>
+        Announcements
+      </a>
+      <a href="residents.html" class="nav-item active">
+        <div class="nav-icon"><i class="fas fa-users"></i></div>
+        Residents
+      </a>
+      <a href="households.html" class="nav-item">
+        <div class="nav-icon"><i class="fas fa-house-user"></i></div>
+        Households
+      </a>
+    </div>
+    
+    <div class="nav-section">
+      <div class="nav-section-title">Reports</div>
+      <a href="reports.html" class="nav-item">
+        <div class="nav-icon"><i class="fas fa-chart-bar"></i></div>
+        Analytics
+      </a>
+      <a href="#" class="nav-item" onclick="exportAllData()">
+        <div class="nav-icon"><i class="fas fa-file-export"></i></div>
+        Export Data
+      </a>
+    </div>
+    
+    <div class="nav-section">
+      <div class="nav-section-title">Settings</div>
+      <a href="settings.html" class="nav-item">
+        <div class="nav-icon"><i class="fas fa-cog"></i></div>
+        Settings
+      </a>
+    </div>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Residents Management</h1>
+      <p>Manage and view all registered residents</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-primary" id="addResidentBtn">
+        <i class="fas fa-user-plus"></i>
+        Add Resident
+      </button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- Role-based access message -->
+    <div id="accessMessage" class="restricted-access" style="display: none;">
+      <h3>Access Restricted</h3>
+      <p>This page is only accessible to Barangay Captain and Secretary.</p>
+      <a href="dashboard.html" class="btn-primary" style="display: inline-block;">Return to Dashboard</a>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="controls-bar" id="controlsBar">
+      <div class="search-box">
+        <div class="search-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <input type="text" id="searchInput" placeholder="Search by name, address, or email...">
+      </div>
+      <select class="filter-select" id="genderFilter" title="Filter residents by gender">
+        <option value="">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <select class="filter-select" id="statusFilter" title="Filter residents by status">
+        <option value="">All Status</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+    </div>
+
+    <!-- Residents Table -->
+    <div class="residents-table" id="residentsTable">
+      <div class="table-header">
+        <h2>All Residents</h2>
+        <span class="table-info" id="tableInfo">0 residents</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="residentsTableBody">
+          <!-- Residents will be rendered here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal" id="residentModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add Resident</h2>
+      <button class="btn-close" id="closeModalBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="residentForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" required>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" required>
+          </div>
+          <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" required>
+          </div>
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label for="address">Address</label>
+            <input type="text" id="address" required>
+          </div>
+          <div class="form-group">
+            <label for="contactNumber">Contact Number</label>
+            <input type="text" id="contactNumber">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email">
+          </div>
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" required>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="householdId">Household</label>
+            <select id="householdId"></select>
+          </div>
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="isVoter">
+              <label for="isVoter">Registered Voter</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="isPWD">
+              <label for="isPWD">Person with Disability (PWD)</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="is4Ps">
+              <label for="is4Ps">4Ps Beneficiary</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase & JS -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKjUzCvZBVfSFTnmJ8QXJcL7nNVlPiH3g",
+    authDomain: "bris-ae04d.firebaseapp.com",
+    projectId: "bris-ae04d",
+    storageBucket: "bris-ae04d.firebasestorage.app",
+    messagingSenderId: "626608470273",
+    appId: "1:626608470273:web:c33211ca2edb33465dc300",
+    measurementId: "G-WFNQCMHVBW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let residents = [];
+  let households = [];
+  let editingResidentId = null;
+
+  // Check authentication and role
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    // Check role - Only Captain and Secretary can access
+    const role = localStorage.getItem('userRole');
+    if (role !== 'Barangay_Captain' && role !== 'Barangay_Secretary') {
+      // Show restricted access message
+      document.getElementById('accessMessage').style.display = 'block';
+      document.getElementById('controlsBar').style.display = 'none';
+      document.getElementById('residentsTable').style.display = 'none';
+      
+      // Redirect based on role
+      setTimeout(() => {
+        if (role === 'Resident') {
+          window.location.href = 'dashboard_resident.html';
+        } else if (role === 'Barangay_Official') {
+          window.location.href = 'dashboard_official.html';
+        } else {
+          window.location.href = 'dashboard.html';
+        }
+      }, 3000);
+      return;
+    }
+
+    // Load data if authorized
+    loadResidents();
+    loadHouseholds();
+  });
+  
+  const modal = document.getElementById('residentModal');
+  const addBtn = document.getElementById('addResidentBtn');
+  const closeBtn = document.getElementById('closeModalBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const form = document.getElementById('residentForm');
+
+  addBtn.addEventListener('click', () => {
+    editingResidentId = null;
+    document.getElementById('modalTitle').textContent = 'Add New Resident';
+    form.reset();
+    modal.classList.add('active');
+  });
+
+  closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+  cancelBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+  async function loadHouseholds() {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'households'));
+      households = [];
+      const select = document.getElementById('householdId');
+      select.innerHTML = '<option value="">Select Household</option>';
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        households.push({ id: doc.id, ...data });
+        const option = document.createElement('option');
+        option.value = doc.id;
+        option.textContent = `${data.householdNumber} - ${data.headOfFamily}`;
+        select.appendChild(option);
+      });
+    } catch (error) { console.error('Error loading households:', error); }
+  }
+
+  async function loadResidents() {
+    try {
+      const q = query(collection(db, 'residents'), orderBy('lastName', 'asc'));
+      const querySnapshot = await getDocs(q);
+      residents = [];
+      querySnapshot.forEach((doc) => { residents.push({ id: doc.id, ...doc.data() }); });
+      displayResidents(residents);
+      updateTableInfo(residents.length);
+    } catch (error) { console.error('Error loading residents:', error); displayEmptyState(); }
+  }
+
+  function displayResidents(data) {
+    const tbody = document.getElementById('residentsTableBody');
+    if (data.length === 0) { displayEmptyState(); return; }
+    tbody.innerHTML = data.map(resident => `
+      <tr>
+        <td>
+          <div class="resident-name">
+            <div class="resident-avatar">${resident.firstName?.charAt(0) || 'R'}</div>
+            <div class="resident-info">
+              <h4>${resident.firstName} ${resident.lastName}</h4>
+              <p>${resident.email || 'No email'}</p>
+            </div>
+          </div>
+        </td>
+        <td>${resident.age}</td>
+        <td>${resident.gender}</td>
+        <td>${resident.address}</td>
+        <td>${resident.contactNumber || 'N/A'}</td>
+        <td><span class="badge ${resident.status?.toLowerCase()}">${resident.status}</span></td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn-icon edit" onclick="editResident('${resident.id}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-icon delete" onclick="deleteResident('${resident.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function displayEmptyState() {
+    const tbody = document.getElementById('residentsTableBody');
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          <div class="empty-state">
+            <i class="fas fa-users"></i>
+            <h3>No residents found</h3>
+            <p>Start by adding your first resident to the system</p>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  function updateTableInfo(count) {
+    document.getElementById('tableInfo').textContent = `${count} resident${count !== 1 ? 's' : ''}`;
+  }
+
+  // Form submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const residentData = {
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+      age: parseInt(document.getElementById('age').value),
+      gender: document.getElementById('gender').value,
+      address: document.getElementById('address').value,
+      contactNumber: document.getElementById('contactNumber').value,
+      email: document.getElementById('email').value,
+      status: document.getElementById('status').value,
+      householdId: document.getElementById('householdId').value,
+      isVoter: document.getElementById('isVoter').checked,
+      isPWD: document.getElementById('isPWD').checked,
+      is4Ps: document.getElementById('is4Ps').checked,
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      if (editingResidentId) {
+        // Update existing resident
+        await updateDoc(doc(db, 'residents', editingResidentId), residentData);
+        alert('Resident updated successfully!');
+      } else {
+        // Add new resident
+        await addDoc(collection(db, 'residents'), residentData);
+        alert('Resident added successfully!');
+      }
+      
+      modal.classList.remove('active');
+      loadResidents();
+    } catch (error) {
+      console.error('Error saving resident:', error);
+      alert('Error saving resident: ' + error.message);
+    }
+  });
+
+  // Global functions for edit/delete
+  window.editResident = async function(id) {
+    const resident = residents.find(r => r.id === id);
+    if (!resident) return;
+    
+    editingResidentId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Resident';
+    
+    // Fill form with resident data
+    document.getElementById('firstName').value = resident.firstName || '';
+    document.getElementById('lastName').value = resident.lastName || '';
+    document.getElementById('age').value = resident.age || '';
+    document.getElementById('gender').value = resident.gender || '';
+    document.getElementById('address').value = resident.address || '';
+    document.getElementById('contactNumber').value = resident.contactNumber || '';
+    document.getElementById('email').value = resident.email || '';
+    document.getElementById('status').value = resident.status || 'Active';
+    document.getElementById('householdId').value = resident.householdId || '';
+    document.getElementById('isVoter').checked = resident.isVoter || false;
+    document.getElementById('isPWD').checked = resident.isPWD || false;
+    document.getElementById('is4Ps').checked = resident.is4Ps || false;
+    
+    modal.classList.add('active');
+  };
+
+  window.deleteResident = async function(id) {
+    if (!confirm('Are you sure you want to delete this resident?')) return;
+    
+    try {
+      await deleteDoc(doc(db, 'residents', id));
+      alert('Resident deleted successfully!');
+      loadResidents();
+    } catch (error) {
+      console.error('Error deleting resident:', error);
+      alert('Error deleting resident: ' + error.message);
+    }
+  };
+
+  // Search functionality
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const filtered = residents.filter(resident => 
+      (resident.firstName?.toLowerCase().includes(searchTerm) ||
+       resident.lastName?.toLowerCase().includes(searchTerm) ||
+       resident.address?.toLowerCase().includes(searchTerm) ||
+       resident.email?.toLowerCase().includes(searchTerm))
+    );
+    displayResidents(filtered);
+    updateTableInfo(filtered.length);
+  });
+
+  // Filter functionality
+  document.getElementById('genderFilter').addEventListener('change', (e) => {
+    applyFilters();
+  });
+
+  document.getElementById('statusFilter').addEventListener('change', (e) => {
+    applyFilters();
+  });
+
+  function applyFilters() {
+    const genderFilter = document.getElementById('genderFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    let filtered = residents;
+    
+    if (genderFilter) {
+      filtered = filtered.filter(resident => resident.gender === genderFilter);
+    }
+    
+    if (statusFilter) {
+      filtered = filtered.filter(resident => resident.status === statusFilter);
+    }
+    
+    displayResidents(filtered);
+    updateTableInfo(filtered.length);
+  }
+</script>
+</body>
+</html>
